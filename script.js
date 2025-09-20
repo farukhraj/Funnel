@@ -149,4 +149,19 @@ async function loadInteractions(){
 
 // Add new interaction
 addInteractionForm.addEventListener("submit", async e=>{
-  e.preventDefault
+  e.preventDefault();
+  if(!currentClientId) return;
+  const data = {
+    type: "interaction",
+    interactionType: document.getElementById("interactionType").value,
+    phoneUsed: document.getElementById("phoneUsed").value,
+    notes: document.getElementById("notes").value,
+    date: serverTimestamp()
+  };
+  await addDoc(collection(db,"clients",currentClientId,"history"), data);
+  addInteractionForm.reset();
+  loadInteractions();
+});
+
+// Initial load
+loadClients();
