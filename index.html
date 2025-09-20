@@ -4,24 +4,93 @@
 <meta charset="UTF-8">
 <title>Funnel Management App</title>
 <link rel="stylesheet" href="style.css">
-<style>
-/* Reset & body */
-body { margin:0; font-family: Arial, sans-serif; background:#f8f8f8; }
+</head>
+<body>
 
-/* Tabs */
-.tabs { display:flex; background:#4CAF50; }
-.tabs button { flex:1; padding:15px; color:white; border:none; cursor:pointer; font-size:16px; }
-.tabs button:hover { background:#45a049; }
-.tabs button.active { background:#3e8e41; }
+<h1>Funnel Management App</h1>
 
-/* Tab content */
-.tab-content { display:none; padding:15px; }
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="dashboardTab">Dashboard</button>
+  <button class="tab-btn" data-tab="salesLeadsTab">Sales Leads</button>
+  <button class="tab-btn" data-tab="addClientTab">Add Client</button>
+</div>
 
-/* Tables */
-table { width:100%; border-collapse: collapse; background:white; }
-th, td { border:1px solid #ddd; padding:10px; text-align:center; }
-th { background:#f2f2f2; }
-table tbody tr:nth-child(even){background:#f9f9f9;}
+<!-- Tab Contents -->
+<div id="dashboardTab" class="tab-content" style="display:block;">
+  <h2>Dashboard</h2>
+  <div class="dashboard-card">Total Clients: <span id="totalClients">0</span></div>
+</div>
 
-/* Forms */
-input, select, button, textarea { width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box
+<div id="salesLeadsTab" class="tab-content">
+  <h2>Sales Leads</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th><th>Stage</th><th>Phones</th><th>Services</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="clientsTable"></tbody>
+  </table>
+</div>
+
+<div id="addClientTab" class="tab-content">
+  <h2>Add Client</h2>
+  <form id="addClientForm">
+    <input type="text" id="clientName" placeholder="Name" required>
+    <input type="text" id="clientPhone1" placeholder="Phone 1">
+    <input type="text" id="clientPhone2" placeholder="Phone 2 (optional)">
+    <input type="text" id="clientStage" placeholder="Stage">
+    <input type="text" id="clientCountry" placeholder="Country">
+    <input type="text" id="clientService" placeholder="Service">
+    <input type="number" id="clientPrice" placeholder="Estimated Price">
+    <button type="submit">Add Client</button>
+  </form>
+</div>
+
+<!-- Interactions Modal -->
+<div id="interactionModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Interactions for <span id="modalClientName"></span></h2>
+    <form id="addInteractionForm">
+      <select id="interactionType" required>
+        <option value="">-- Type --</option>
+        <option value="Call">Call</option>
+        <option value="Message">Message</option>
+        <option value="Meeting">Meeting</option>
+      </select>
+      <input type="text" id="interactionPhone" placeholder="Phone Used">
+      <textarea id="interactionNotes" placeholder="Notes"></textarea>
+      <button type="submit">Add Interaction</button>
+    </form>
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Type</th><th>Phone</th><th>Notes</th></tr>
+      </thead>
+      <tbody id="interactionsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Edit Client Modal -->
+<div id="editClientModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeEditModal()">&times;</span>
+    <h2>Edit Client</h2>
+    <form id="editClientForm">
+      <input type="text" id="editClientName" placeholder="Name" required>
+      <input type="text" id="editClientPhone1" placeholder="Phone 1">
+      <input type="text" id="editClientPhone2" placeholder="Phone 2 (optional)">
+      <input type="text" id="editClientStage" placeholder="Stage">
+      <input type="text" id="editClientCountry" placeholder="Country">
+      <input type="text" id="editClientService" placeholder="Service">
+      <input type="number" id="editClientPrice" placeholder="Estimated Price">
+      <button type="submit">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
