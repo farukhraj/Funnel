@@ -1,70 +1,31 @@
-/* Reset & body */
-body { margin:0; font-family: Arial, sans-serif; background:#f8f8f8; }
-
-/* Tabs */
-.tabs { display:flex; background:#4CAF50; }
+body { margin:0; font-family:Arial,sans-serif; background:#f8f8f8; padding:10px; }
+h1 { text-align:center; }
+.tabs { display:flex; background:#4CAF50; margin-bottom:10px; }
 .tabs button { flex:1; padding:15px; color:white; border:none; cursor:pointer; font-size:16px; }
 .tabs button:hover { background:#45a049; }
 .tabs button.active { background:#3e8e41; }
-
-/* Tab content */
-.tab-content { display:none; padding:15px; }
-
-/* Dashboard cards */
+.tab-content { display:none; padding:10px; }
 .dashboard-card { background:white; padding:15px; margin-bottom:10px; border-radius:10px; text-align:center; }
-
-/* Tables */
-table { width:100%; border-collapse: collapse; background:white; }
+table { width:100%; border-collapse:collapse; background:white; }
 th, td { border:1px solid #ddd; padding:10px; text-align:center; }
 th { background:#f2f2f2; }
 table tbody tr:nth-child(even){background:#f9f9f9;}
-
-/* Forms */
 input, select, button, textarea { width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box; font-size:16px; }
 button { background:#4CAF50; color:white; border:none; cursor:pointer; }
 button:hover { background:#45a049; }
-
-/* Modal */
 .modal { position:fixed; top:0; left:0; width:100%; height:100%; 
          background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:100; }
 .modal-content { background:white; padding:20px; border-radius:10px; width:90%; max-width:500px; max-height:90%; overflow:auto; }
 .close { float:right; cursor:pointer; font-weight:bold; font-size:20px; }
 
-/* Responsive adjustments for mobile */
+/* Responsive mobile app-like cards */
 @media screen and (max-width:600px){
-  table, thead, tbody, th, td, tr {
-    display: block;
-    width: 100%;
-  }
-  thead { display: none; }
-
-  tbody tr {
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 10px;
-    background:white;
-  }
-
-  tbody td {
-    display:block;
-    text-align:left;
-    padding:5px 10px;
-    position:relative;
-  }
-
-  tbody td::before {
-    content: attr(data-label);
-    font-weight:bold;
-    display:inline-block;
-    width:120px;
-  }
-
-  tbody td button {
-    margin-top:10px;
-    width:100%;
-  }
-
+  table, thead, tbody, th, td, tr { display:block; width:100%; }
+  thead { display:none; }
+  tbody tr { margin-bottom:10px; border:1px solid #ddd; border-radius:10px; padding:10px; background:white; }
+  tbody td { display:block; text-align:left; padding:5px 10px; position:relative; }
+  tbody td::before { content: attr(data-label); font-weight:bold; display:inline-block; width:120px; }
+  tbody td button { margin-top:10px; width:100%; }
   .modal-content { width:95%; height:95%; padding:15px; }
   input, select, textarea, button { font-size:18px; padding:12px; }
 }
