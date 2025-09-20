@@ -1,120 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Funnel Management App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <header>
-    <h1>Funnel Management App</h1>
-    <nav>
-      <button class="tab-btn active" data-tab="dashboardTab">Dashboard</button>
-      <button class="tab-btn" data-tab="leadsTab">Leads</button>
-      <button class="tab-btn" data-tab="addClientTab">Add Client</button>
-    </nav>
+    <h1>Funnel Management</h1>
+    <p class="subtitle">Mobile-first CRM — Leads, Profile & History</p>
   </header>
 
-  <!-- Tabs -->
-  <section id="dashboardTab" class="tab-content" style="display:block;">
-    <h2>Dashboard</h2>
-    <p>Coming soon...</p>
-  </section>
+  <!-- Content sections for tabs -->
+  <main>
+    <!-- Dashboard (placeholder) -->
+    <section id="dashboardTab" class="tab-content" style="display:block;">
+      <h2>Dashboard</h2>
+      <p>Summary coming soon — total clients: <strong id="totalClients">0</strong></p>
+    </section>
 
-  <section id="leadsTab" class="tab-content">
-    <h2>Sales Leads</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Stage</th>
-          <th>Phones</th>
-          <th>Services</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="clientsTable"></tbody>
-    </table>
-  </section>
+    <!-- Leads -->
+    <section id="leadsTab" class="tab-content">
+      <h2>Leads</h2>
+      <table class="clients-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Stage</th>
+            <th>Phones</th>
+            <th>Services</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="clientsTable"></tbody>
+      </table>
+    </section>
 
-  <section id="addClientTab" class="tab-content">
-    <h2>Add Client</h2>
-    <form id="addClientForm">
-      <input type="text" id="clientName" placeholder="Client Name" required>
-      <input type="text" id="clientPhone1" placeholder="Phone 1">
-      <input type="text" id="clientPhone2" placeholder="Phone 2 (optional)">
-      <input type="text" id="clientEmail" placeholder="Email">
-      <input type="text" id="clientAddress" placeholder="Address">
-      <input type="text" id="clientStage" placeholder="Stage">
-      <input type="text" id="clientExecutive" placeholder="Assigned Executive">
-      <input type="text" id="clientCountry" placeholder="Country">
-      <input type="text" id="clientService" placeholder="Service">
-      <input type="number" id="clientPrice" placeholder="Estimated Price">
-      <input type="text" id="clientProfilePic" placeholder="Profile Picture URL">
-      <button type="submit">Save Client</button>
-    </form>
-  </section>
+    <!-- Add Client -->
+    <section id="addClientTab" class="tab-content">
+      <h2>Add Client</h2>
+      <form id="addClientForm">
+        <input id="clientName" placeholder="Name" required />
+        <input id="clientPhone1" placeholder="Phone 1" />
+        <input id="clientPhone2" placeholder="Phone 2 (optional)" />
+        <input id="clientEmail" placeholder="Email" />
+        <input id="clientAddress" placeholder="Address" />
+        <input id="clientStage" placeholder="Stage" />
+        <input id="clientExecutive" placeholder="Assigned Executive" />
+        <input id="clientCountry" placeholder="Service - Country" />
+        <input id="clientService" placeholder="Service - Sub" />
+        <input id="clientPrice" type="number" placeholder="Estimated Price" />
+        <input id="clientProfilePic" placeholder="Profile picture URL" />
+        <button type="submit">Save Client</button>
+      </form>
+    </section>
+  </main>
 
-  <!-- Client Modal -->
-  <div id="clientModal" class="modal">
+  <!-- Client modal: Profile + History (full-screen on mobile) -->
+  <div id="clientModal" class="modal" aria-hidden="true">
     <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2 id="modalClientName"></h2>
-      
+      <button class="modal-close" id="modalCloseBtn" aria-label="Close">✕</button>
+      <h2 id="modalClientTitle">Client</h2>
+
+      <!-- modal internal tabs -->
       <div class="modal-tabs">
         <button class="modal-tab-btn active" data-tab="profileTab">Profile</button>
         <button class="modal-tab-btn" data-tab="historyTab">History</button>
       </div>
 
-      <!-- Modal Tab Contents -->
+      <!-- profile tab -->
       <div id="profileTab" class="modal-tab-content" style="display:block;">
         <form id="profileForm">
-          <input type="text" id="modalName" placeholder="Name">
-          <input type="text" id="modalPhone1" placeholder="Phone 1">
-          <input type="text" id="modalPhone2" placeholder="Phone 2">
-          <input type="text" id="modalEmail" placeholder="Email">
-          <input type="text" id="modalAddress" placeholder="Address">
-          <input type="text" id="modalStage" placeholder="Stage">
-          <input type="text" id="modalExecutive" placeholder="Assigned Executive">
-          <input type="text" id="modalCountry" placeholder="Country">
-          <input type="text" id="modalService" placeholder="Service">
-          <input type="number" id="modalPrice" placeholder="Estimated Price">
-          <input type="text" id="modalProfilePic" placeholder="Profile Picture URL">
+          <input id="modalName" placeholder="Name" required />
+          <input id="modalPhone1" placeholder="Phone 1" />
+          <input id="modalPhone2" placeholder="Phone 2" />
+          <input id="modalEmail" placeholder="Email" />
+          <input id="modalAddress" placeholder="Address" />
+          <input id="modalStage" placeholder="Stage" />
+          <input id="modalExecutive" placeholder="Assigned Executive" />
+          <input id="modalCountry" placeholder="Country" />
+          <input id="modalService" placeholder="Service" />
+          <input id="modalPrice" type="number" placeholder="Estimated Price" />
+          <input id="modalProfilePic" placeholder="Profile picture URL" />
           <button type="submit">Save Profile</button>
         </form>
       </div>
 
-      <div id="historyTab" class="modal-tab-content">
-        <form id="addInteractionForm">
-          <select id="interactionType" required>
-            <option value="">Select Type</option>
+      <!-- history tab -->
+      <div id="historyTab" class="modal-tab-content" style="display:none;">
+        <h3>History (interactions & profile edits)</h3>
+
+        <!-- add a new history record (interaction or stage change) -->
+        <form id="addHistoryForm">
+          <select id="historyType" required>
+            <option value="">Type</option>
             <option value="Call">Call</option>
             <option value="Message">Message</option>
             <option value="Meeting">Meeting</option>
+            <option value="StageChange">Stage Change</option>
+            <option value="Note">Note</option>
           </select>
-          <input type="text" id="phoneUsed" placeholder="Phone Used">
-          <input type="date" id="nextFollowUp" placeholder="Next Follow-up Date">
-          <textarea id="notes" placeholder="Notes"></textarea>
-          <button type="submit">Add History Record</button>
+          <input id="historyPhone" placeholder="Phone used (optional)" />
+          <input id="historyNextFollowUp" type="date" placeholder="Next follow-up (optional)" />
+          <textarea id="historyNotes" placeholder="Notes / details"></textarea>
+          <button type="submit">Add History</button>
         </form>
 
-        <table>
+        <table class="history-table">
           <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Phone</th>
-              <th>Next Follow-up</th>
-              <th>Notes</th>
-            </tr>
+            <tr><th>Date</th><th>Type</th><th>Phone</th><th>Next Follow-up</th><th>Details</th></tr>
           </thead>
-          <tbody id="interactionsTable"></tbody>
+          <tbody id="historyTableBody"></tbody>
         </table>
       </div>
     </div>
   </div>
+
+  <!-- Bottom nav (app-style) -->
+  <nav id="bottomNav" class="bottom-nav">
+    <button class="tab-btn active" data-tab="dashboardTab">🏠 Dashboard</button>
+    <button class="tab-btn" data-tab="leadsTab">📋 Leads</button>
+    <button class="tab-btn" data-tab="addClientTab">➕ Add</button>
+  </nav>
 
   <script type="module" src="script.js"></script>
 </body>
