@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Funnel Management Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1, h2 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid black; padding: 10px; text-align: center; }
+    th { background: #f2f2f2; }
+    form { margin: 20px auto; max-width: 500px; display: flex; flex-direction: column; gap: 10px; }
+    input, select, button, textarea { padding: 8px; font-size: 14px; }
+    button { background: #4CAF50; color: white; border: none; cursor: pointer; }
+    button:hover { background: #45a049; }
+    .interactions { margin-top: 20px; border: 1px solid #ddd; padding: 15px; }
+  </style>
+</head>
+<body>
+  <h1>Funnel Management Test</h1>
+
+  <!-- Add Client Form -->
+  <h2>Add New Client</h2>
+  <form id="addClientForm">
+    <input type="text" id="name" placeholder="Client's Name" required>
+    <input type="text" id="stage" placeholder="Stage (e.g. New, In Progress)">
+    <input type="text" id="phone1" placeholder="Phone 1">
+    <input type="text" id="phone2" placeholder="Phone 2 (optional)">
+    <input type="text" id="servicePrimary" placeholder="Service Primary (e.g. Country)">
+    <input type="text" id="serviceSub" placeholder="Service Sub (e.g. Visa)">
+    <input type="number" id="estimatedPrice" placeholder="Estimated Price">
+    <button type="submit">Add Client</button>
+  </form>
+
+  <!-- Clients Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Stage</th>
+        <th>Phones</th>
+        <th>Interested Services</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="clientsTable"></tbody>
+  </table>
+
+  <!-- Interactions Section -->
+  <div id="interactionsSection" class="interactions" style="display:none;">
+    <h2>Interactions for <span id="clientNameTitle"></span></h2>
+
+    <form id="addInteractionForm">
+      <select id="interactionType" required>
+        <option value="">-- Select Type --</option>
+        <option value="Call">Call</option>
+        <option value="Message">Message</option>
+        <option value="Meeting">Meeting</option>
+      </select>
+      <input type="text" id="phoneUsed" placeholder="Phone Used">
+      <textarea id="notes" placeholder="Interaction Notes"></textarea>
+      <button type="submit">Add Interaction</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Phone</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="interactionsTable"></tbody>
+    </table>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCC26AlX5xVRo_s0nDI1Ua26JbWh2d1FKk",
+      authDomain: "leads-to-funnel.firebaseapp.com",
+      projectId: "leads-to-funnel",
+      storageBucket: "leads-to-funnel.firebasestorage.app",
+      messagingSenderId: "574308221054",
+      appId: "1:574308221054:web:9a27e9b1e8e8c0270d982f",
+      measurementId: "G-2M5P17GZZJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let currentClientId = null;
+    let currentClientName = "";
+
+    // Load Clients
+    async function loadClients() {
+      const tableBody = document.getElementById("clientsTable");
+      tableBody.innerHTML = "";
+
+      const querySnapshot = await getDocs(collection(db, "clients"));
+      querySnapshot.forEach((docSnap) => {
+        const client = docSnap.data();
+
+        const phones = client.phones ? client.phones.join(", ") : "N/A";
+        let servicesText = "";
+        if (client.interestedServices && client.interestedServices.length > 0) {
+          client.interestedServices.forEach(service => {
+            servicesText += `${service.primary || ""} (${service.sub || ""}) $${service.estimatedPrice || ""}<br>`;
+          });
+        }
+
+        const row = `
+          <tr>
+            <td>${client.name || "N/A"}</td>
+            <td>${client.stage || "N/A"}</td>
+            <td>${phones}</td>
+            <td>${servicesText}</td>
+            <td><button onclick="viewInteractions('${docSnap.id}', '${client.name}')">View Interactions</button></td>
+          </tr>
+        `;
+        tableBody.innerHTML += row;
+      });
+    }
+
+    // Add Client
+    document.getElementById("addClientForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const stage = document.getElementById("stage").value;
+      const phone1 = document.getElementById("phone1").value;
+      const phone2 = document.getElementById("phone2").value;
+      const servicePrimary = document.getElementById("servicePrimary").value;
+      const serviceSub = document.getElementById("serviceSub").value;
+      const estimatedPrice = parseFloat(document.getElementById("estimatedPrice").value);
+
+      await addDoc(collection(db, "clients"), {
+        name,
+        stage,
+        phones: [phone1, phone2].filter(Boolean),
+        interestedServices: [
+          { primary: servicePrimary, sub: serviceSub, estimatedPrice }
+        ],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+
+      e.target.reset();
+      loadClients();
+    });
+
+    // View Interactions
+    window.viewInteractions = async function(clientId, clientName) {
+      currentClientId = clientId;
+      currentClientName = clientName;
+      document.getElementById("clientNameTitle").innerText = clientName;
+      document.getElementById("interactionsSection").style.display = "block";
+      loadInteractions();
+    }
+
+    // Load Interactions
+    async function loadInteractions() {
+      const tableBody = document.getElementById("interactionsTable");
+      tableBody.innerHTML = "";
+
+      if (!currentClientId) return;
+
+      const interactionsRef = collection(db, "clients", currentClientId, "interactions");
+      const querySnapshot = await getDocs(interactionsRef);
+      querySnapshot.forEach((docSnap) => {
+        const interaction = docSnap.data();
+        const row = `
+          <tr>
+            <td>${interaction.date?.toDate().toLocaleString() || "N/A"}</td>
+            <td>${interaction.type || "N/A"}</td>
+            <td>${interaction.phoneUsed || "N/A"}</td>
+            <td>${interaction.notes || ""}</td>
+          </tr>
+        `;
+        tableBody.innerHTML += row;
+      });
+    }
+
+    // Add Interaction
+    document.getElementById("addInteractionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentClientId) return;
+
+      const type = document.getElementById("interactionType").value;
+      const phoneUsed = document.getElementById("phoneUsed").value;
+      const notes = document.getElementById("notes").value;
+
+      const interactionsRef = collection(db, "clients", currentClientId, "interactions");
+      await addDoc(interactionsRef, {
+        type,
+        phoneUsed,
+        notes,
+        date: serverTimestamp()
+      });
+
+      e.target.reset();
+      loadInteractions();
+    });
+
+    loadClients();
+  </script>
+</body>
+</html>
