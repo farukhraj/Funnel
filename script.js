@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-// Firebase configuration
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCC26AlX5xVRo_s0nDI1Ua26JbWh2d1FKk",
   authDomain: "leads-to-funnel.firebaseapp.com",
@@ -16,89 +16,64 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Modal Elements
+// Modal
 const addClientBtn = document.getElementById("addClientBtn");
 const clientModal = document.getElementById("clientModal");
 const closeModal = document.getElementById("closeModal");
 const clientForm = document.getElementById("clientForm");
 
-// Open Modal
-addClientBtn.addEventListener("click", () => {
-  clientModal.style.display = "flex";
-});
+addClientBtn.addEventListener("click", () => clientModal.style.display = "flex");
+closeModal.addEventListener("click", () => clientModal.style.display = "none");
 
-// Close Modal
-closeModal.addEventListener("click", () => {
-  clientModal.style.display = "none";
-});
-
-// Add Client via Modal
+// Add Client
 clientForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  try {
-    await addDoc(collection(db, "clients"), {
-      name: document.getElementById("clientName").value,
-      phones: [document.getElementById("clientPhone").value],
-      stage: document.getElementById("clientStage").value,
-      interestedServices: [
-        {
-          primary: document.getElementById("clientCountry").value,
-          sub: document.getElementById("clientService").value,
-          estimatedPrice: parseFloat(document.getElementById("clientPrice").value)
-        }
-      ],
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-
-    alert("Client added!");
-    clientModal.style.display = "none";
-    clientForm.reset();
-    loadClients(); // refresh client table without full reload
-  } catch (error) {
-    console.error("Error adding client: ", error);
-    alert("Failed to add client. Check console for details.");
-  }
+  await addDoc(collection(db, "clients"), {
+    name: document.getElementById("clientName").value,
+    phones: [document.getElementById("clientPhone").value],
+    stage: document.getElementById("clientStage").value,
+    interestedServices: [{
+      primary: document.getElementById("clientCountry").value,
+      sub: document.getElementById("clientService").value,
+      estimatedPrice: parseFloat(document.getElementById("clientPrice").value)
+    }],
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  });
+  clientModal.style.display = "none";
+  clientForm.reset();
+  loadClients();
 });
 
-// Load Clients into Table
+// Load Clients
 async function loadClients() {
   const tableBody = document.getElementById("clientsTable");
-  if (!tableBody) return;
   tableBody.innerHTML = "";
-
   const querySnapshot = await getDocs(collection(db, "clients"));
   querySnapshot.forEach((docSnap) => {
     const client = docSnap.data();
-    const phones = client.phones ? client.phones.join(", ") : "N/A";
+    const phones = client.phones?.join(", ") || "N/A";
     let servicesText = "";
-    if (client.interestedServices && client.interestedServices.length > 0) {
-      client.interestedServices.forEach(service => {
-        servicesText += `${service.primary || ""} (${service.sub || ""}) $${service.estimatedPrice || ""}<br>`;
-      });
+    if (client.interestedServices) {
+      client.interestedServices.forEach(s => servicesText += `${s.primary} (${s.sub}) $${s.estimatedPrice}<br>`);
     }
-
-    const row = `
+    tableBody.innerHTML += `
       <tr>
-        <td>${client.name || "N/A"}</td>
-        <td>${client.stage || "N/A"}</td>
+        <td>${client.name}</td>
+        <td>${client.stage}</td>
         <td>${phones}</td>
         <td>${servicesText}</td>
-        <td>
-          <button onclick="viewInteractions('${docSnap.id}', '${client.name}')">View Interactions</button>
-        </td>
+        <td><button onclick="viewInteractions('${docSnap.id}','${client.name}')">View Interactions</button></td>
       </tr>
     `;
-    tableBody.innerHTML += row;
   });
 }
 
-// Interactions (same as previous)
+// Interactions
 let currentClientId = null;
-window.viewInteractions = async function(clientId, clientName) {
-  currentClientId = clientId;
-  document.getElementById("clientNameTitle").innerText = clientName;
+window.viewInteractions = async function(id, name) {
+  currentClientId = id;
+  document.getElementById("clientNameTitle").innerText = name;
   document.getElementById("interactionsSection").style.display = "block";
   loadInteractions();
 }
@@ -106,45 +81,29 @@ window.viewInteractions = async function(clientId, clientName) {
 async function loadInteractions() {
   const tableBody = document.getElementById("interactionsTable");
   tableBody.innerHTML = "";
-
   if (!currentClientId) return;
-
-  const interactionsRef = collection(db, "clients", currentClientId, "interactions");
-  const querySnapshot = await getDocs(interactionsRef);
-  querySnapshot.forEach((docSnap) => {
-    const interaction = docSnap.data();
-    const row = `
+  const querySnapshot = await getDocs(collection(db, "clients", currentClientId, "interactions"));
+  querySnapshot.forEach(docSnap => {
+    const i = docSnap.data();
+    tableBody.innerHTML += `
       <tr>
-        <td>${interaction.date?.toDate().toLocaleString() || "N/A"}</td>
-        <td>${interaction.type || "N/A"}</td>
-        <td>${interaction.phoneUsed || "N/A"}</td>
-        <td>${interaction.notes || ""}</td>
+        <td>${i.date?.toDate().toLocaleString() || "N/A"}</td>
+        <td>${i.type || "N/A"}</td>
+        <td>${i.phoneUsed || "N/A"}</td>
+        <td>${i.notes || ""}</td>
       </tr>
     `;
-    tableBody.innerHTML += row;
   });
 }
 
 // Add Interaction
-document.getElementById("addInteractionForm")?.addEventListener("submit", async (e) => {
+document.getElementById("addInteractionForm").addEventListener("submit", async e => {
   e.preventDefault();
   if (!currentClientId) return;
-
-  const type = document.getElementById("interactionType").value;
-  const phoneUsed = document.getElementById("phoneUsed").value;
-  const notes = document.getElementById("notes").value;
-
-  const interactionsRef = collection(db, "clients", currentClientId, "interactions");
-  await addDoc(interactionsRef, {
-    type,
-    phoneUsed,
-    notes,
+  await addDoc(collection(db, "clients", currentClientId, "interactions"), {
+    type: document.getElementById("interactionType").value,
+    phoneUsed: document.getElementById("phoneUsed").value,
+    notes: document.getElementById("notes").value,
     date: serverTimestamp()
   });
-
-  document.getElementById("addInteractionForm").reset();
-  loadInteractions();
-});
-
-// Initial load
-loadClients();
+  document.getElement
