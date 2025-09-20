@@ -10,8 +10,8 @@
 
   <!-- Tabs -->
   <div class="tabs">
-    <button class="tab-btn" onclick="openTab('clientList')">Client List</button>
-    <button class="tab-btn" onclick="openTab('addClient')">Add Client</button>
+    <button onclick="openTab('clientList')">Client List</button>
+    <button onclick="openTab('addClient')">Add Client</button>
   </div>
 
   <!-- Client List Tab -->
@@ -34,7 +34,8 @@
   <div id="addClient" class="tab-content" style="display:none;">
     <form id="addClientForm">
       <input type="text" id="clientName" placeholder="Client Name" required>
-      <input type="text" id="clientPhone" placeholder="Phone" required>
+      <input type="text" id="clientPhone1" placeholder="Phone 1">
+      <input type="text" id="clientPhone2" placeholder="Phone 2 (optional)">
       <input type="text" id="clientStage" placeholder="Stage">
       <input type="text" id="clientCountry" placeholder="Country">
       <input type="text" id="clientService" placeholder="Service">
@@ -43,16 +44,12 @@
     </form>
   </div>
 
-  <!-- Firebase + App JS -->
   <script type="module" src="script.js"></script>
 
-  <!-- Tabs Script -->
   <script>
     function openTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.style.display = 'none';
-      });
-      document.getElementById(tabId).style.display = 'block';
+      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display='none');
+      document.getElementById(tabId).style.display='block';
     }
   </script>
 </body>
