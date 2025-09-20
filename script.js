@@ -104,3 +104,80 @@ async function loadInteractions(){
 
 // Initial load
 loadClients();
+
+let editingClientId = null;
+
+// Edit client
+window.editClient = async function(clientId) {
+  const docRef = doc(db, "clients", clientId);
+  const docSnap = await getDoc(docRef);
+  if(docSnap.exists()){
+    const c = docSnap.data();
+    document.getElementById("clientName").value = c.name;
+    document.getElementById("clientPhone1").value = c.phones[0] || "";
+    document.getElementById("clientPhone2").value = c.phones[1] || "";
+    document.getElementById("clientStage").value = c.stage || "";
+    document.getElementById("clientCountry").value = c.interestedServices?.[0]?.primary || "";
+    document.getElementById("clientService").value = c.interestedServices?.[0]?.sub || "";
+    document.getElementById("clientPrice").value = c.interestedServices?.[0]?.estimatedPrice || "";
+
+    editingClientId = clientId;
+    document.querySelector(".tab-btn[data-tab='addClientTab']").click(); // switch to Add Client tab
+  }
+}
+
+// Delete client
+window.deleteClient = async function(clientId){
+  if(confirm("Are you sure you want to delete this client?")){
+    await deleteDoc(doc(db,"clients",clientId));
+    alert("Client deleted!");
+    loadClients();
+  }
+}
+
+// Update the addClientForm submit event
+addClientForm.addEventListener("submit", async e=>{
+  e.preventDefault();
+  
+  const clientData = {
+    name: document.getElementById("clientName").value,
+    phones: [document.getElementById("clientPhone1").value, document.getElementById("clientPhone2").value].filter(Boolean),
+    stage: document.getElementById("clientStage").value,
+    interestedServices:[{
+      primary: document.getElementById("clientCountry").value,
+      sub: document.getElementById("clientService").value,
+      estimatedPrice: parseFloat(document.getElementById("clientPrice").value)
+    }],
+    updatedAt: serverTimestamp()
+  };
+
+  if(editingClientId){
+    const docRef = doc(db,"clients",editingClientId);
+    await updateDoc(docRef, clientData);
+    alert("Client updated!");
+    editingClientId = null;
+  } else {
+    clientData.createdAt = serverTimestamp();
+    await addDoc(collection(db,"clients"), clientData);
+    alert("Client added!");
+  }
+
+  addClientForm.reset();
+  loadClients();
+  document.querySelector(".tab-btn[data-tab='salesLeadsTab']").click(); // switch back to Sales Leads
+});
+
+clientsTable.innerHTML += `
+  <tr>
+    <td data-label="Name">${c.name}</td>
+    <td data-label="Stage">${c.stage}</td>
+    <td data-label="Phones">${phones}</td>
+    <td data-label="Services">${services}</td>
+    <td data-label="Actions">
+      <button onclick="openInteractions('${docSnap.id}','${c.name}')">View Interactions</button>
+      <button onclick="editClient('${docSnap.id}')">Edit</button>
+      <button onclick="deleteClient('${docSnap.id}')">Delete</button>
+    </td>
+  </tr>
+`;
+
