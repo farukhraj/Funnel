@@ -2,91 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Funnel Management Test</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Test GitHub Pages</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    h1 { color: #4CAF50; }
+  </style>
 </head>
 <body>
-  <h1>Funnel Management Test</h1>
-
-  <!-- Add Client Button -->
-  <button id="addClientBtn">Add Client</button>
-
-  <!-- Modal (hidden by default) -->
-  <div id="clientModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-      background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center;">
-    <div style="background:white; padding:20px; border-radius:10px; width:300px;">
-      <h3>Add Client</h3>
-      <form id="clientForm">
-        <label>Name:</label><br>
-        <input type="text" id="clientName" required><br><br>
-
-        <label>Phone:</label><br>
-        <input type="text" id="clientPhone" required><br><br>
-
-        <label>Stage:</label><br>
-        <input type="text" id="clientStage" required><br><br>
-
-        <label>Country:</label><br>
-        <input type="text" id="clientCountry" required><br><br>
-
-        <label>Service:</label><br>
-        <input type="text" id="clientService" required><br><br>
-
-        <label>Price:</label><br>
-        <input type="number" id="clientPrice" required><br><br>
-
-        <button type="submit">Save</button>
-        <button type="button" id="closeModal">Cancel</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Clients Table -->
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Stage</th>
-        <th>Phone</th>
-        <th>Country</th>
-        <th>Service & Price</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="clientsTable"></tbody>
-  </table>
-
-  <!-- Interactions Section -->
-  <div id="interactionsSection" class="interactions" style="display:none;">
-    <h2>Interactions for <span id="clientNameTitle"></span></h2>
-
-    <form id="addInteractionForm">
-      <select id="interactionType" required>
-        <option value="">-- Select Type --</option>
-        <option value="Call">Call</option>
-        <option value="Message">Message</option>
-        <option value="Meeting">Meeting</option>
-      </select>
-      <input type="text" id="phoneUsed" placeholder="Phone Used">
-      <textarea id="notes" placeholder="Interaction Notes"></textarea>
-      <button type="submit">Add Interaction</button>
-    </form>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Type</th>
-          <th>Phone</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody id="interactionsTable"></tbody>
-    </table>
-  </div>
-
-  <!-- Firebase and JS -->
-  <script type="module" src="script.js"></script>
+  <h1>GitHub Pages is Working!</h1>
+  <p>If you see this page, your site is live.</p>
 </body>
 </html>
-
