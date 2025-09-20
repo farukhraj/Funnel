@@ -19,3 +19,49 @@ th { background: #f2f2f2; }
 form input, form button { display: block; width: 100%; padding: 8px; margin-bottom: 10px; }
 button { background: #4CAF50; color: white; border: none; cursor: pointer; }
 button:hover { background: #45a049; }
+/* Make tables scrollable on mobile */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  overflow-x: auto;
+  display: block;
+}
+
+/* Inputs and buttons full width on small screens */
+input, select, button, textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+/* Tabs stack vertically on small screens */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.tabs button {
+  flex: 1;
+  min-width: 100px;
+}
+
+/* Modal full width on mobile */
+.modal-content {
+  width: 90%;
+  max-width: 500px;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+/* Adjust table font size on mobile */
+@media screen and (max-width: 600px) {
+  table, th, td {
+    font-size: 14px;
+  }
+  h1, h2 {
+    font-size: 18px;
+  }
+}
