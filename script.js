@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCC26AlX5xVRo_s0nDI1Ua26JbWh2d1FKk",
   authDomain: "leads-to-funnel.firebaseapp.com",
@@ -15,17 +14,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let currentClientId = null, editClientId = null;
+let currentClientId = null;
 
-// DOM elements
 const clientsTable = document.getElementById("clientsTable");
 const addClientForm = document.getElementById("addClientForm");
 const interactionModal = document.getElementById("interactionModal");
 const modalClientName = document.getElementById("modalClientName");
 const addInteractionForm = document.getElementById("addInteractionForm");
 const interactionsTable = document.getElementById("interactionsTable");
-const editClientModal = document.getElementById("editClientModal");
-const editClientForm = document.getElementById("editClientForm");
 
 // Tabs
 document.querySelectorAll(".tab-btn").forEach(btn=>{
@@ -37,7 +33,6 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   });
 });
 
-// Load clients
 async function loadClients(){
   clientsTable.innerHTML="";
   const snapshot = await getDocs(collection(db,"clients"));
@@ -53,8 +48,7 @@ async function loadClients(){
         <td data-label="Phones">${phones}</td>
         <td data-label="Services">${services}</td>
         <td data-label="Actions">
-          <button onclick="openInteractions('${docSnap.id}','${c.name}')">View/Edit Interactions</button>
-          <button onclick="openEditClient('${docSnap.id}')">Edit Client</button>
+          <button onclick="openInteractions('${docSnap.id}','${c.name}')">View Interactions</button>
         </td>
       </tr>
     `;
@@ -89,6 +83,7 @@ window.openInteractions = async function(clientId, clientName){
   loadInteractions();
 }
 window.closeModal = ()=>interactionModal.style.display="none";
+
 async function loadInteractions(){
   interactionsTable.innerHTML="";
   if(!currentClientId) return;
@@ -106,63 +101,6 @@ async function loadInteractions(){
     `;
   });
 }
-addInteractionForm.addEventListener("submit", async e=>{
-  e.preventDefault();
-  if(!currentClientId) return;
-  await addDoc(collection(db,"clients",currentClientId,"interactions"),{
-    type: document.getElementById("interactionType").value,
-    phoneUsed: document.getElementById("interactionPhone").value,
-    notes: document.getElementById("interactionNotes").value,
-    date: serverTimestamp()
-  });
-  addInteractionForm.reset();
-  loadInteractions();
-});
-
-// Edit client
-window.openEditClient = async function(clientId){
-  editClientId = clientId;
-  const snapshot = await getDocs(collection(db,"clients"));
-  snapshot.forEach(docSnap=>{
-    if(docSnap.id===clientId){
-      const c = docSnap.data();
-      document.getElementById("editClientName").value=c.name||"";
-      document.getElementById("editClientPhone1").value=c.phones?.[0]||"";
-      document.getElementById("editClientPhone2").value=c.phones?.[1]||"";
-      document.getElementById("editClientStage").value=c.stage||"";
-      document.getElementById("editClientCountry").value=c.interestedServices?.[0]?.primary||"";
-      document.getElementById("editClientService").value=c.interestedServices?.[0]?.sub||"";
-      document.getElementById("editClientPrice").value=c.interestedServices?.[0]?.estimatedPrice||"";
-    }
-  });
-  editClientModal.style.display="flex";
-}
-window.closeEditModal = ()=>editClientModal.style.display="none";
-
-editClientForm.addEventListener("submit", async e=>{
-  e.preventDefault();
-  if(!editClientId) return;
-  const snapshot = await getDocs(collection(db,"clients"));
-  snapshot.forEach(async docSnap=>{
-    if(docSnap.id===editClientId){
-      await addDoc(collection(db,"clients"),{
-        name: document.getElementById("editClientName").value,
-        phones: [document.getElementById("editClientPhone1").value, document.getElementById("editClientPhone2").value].filter(Boolean),
-        stage: document.getElementById("editClientStage").value,
-        interestedServices:[{
-          primary: document.getElementById("editClientCountry").value,
-          sub: document.getElementById("editClientService").value,
-          estimatedPrice: parseFloat(document.getElementById("editClientPrice").value)
-        }],
-        updatedAt: serverTimestamp()
-      });
-    }
-  });
-  editClientForm.reset();
-  editClientModal.style.display="none";
-  loadClients();
-  alert("Client updated!");
-});
 
 // Initial load
 loadClients();
