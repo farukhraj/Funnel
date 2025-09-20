@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCC26AlX5xVRo_s0nDI1Ua26JbWh2d1FKk",
   authDomain: "leads-to-funnel.firebaseapp.com",
@@ -16,38 +15,10 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let currentClientId = null;
-let editingClientId = null;
-
-const clientsTable = document.getElementById("clientsTable");
-const addClientForm = document.getElementById("addClientForm");
-const clientModal = document.getElementById("clientModal");
-const modalClientName = document.getElementById("modalClientName");
-const profileForm = document.getElementById("profileForm");
-const addInteractionForm = document.getElementById("addInteractionForm");
-const interactionsTable = document.getElementById("interactionsTable");
-
-// Tab switching
-document.querySelectorAll(".tab-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    document.querySelectorAll(".tab-content").forEach(c=>c.style.display="none");
-    document.getElementById(btn.dataset.tab).style.display="block";
-  });
-});
-
-// Modal tab switching
-document.querySelectorAll(".modal-tab-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".modal-tab-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    document.querySelectorAll(".modal-tab-content").forEach(c=>c.style.display="none");
-    document.getElementById(btn.dataset.tab).style.display="block";
-  });
-});
 
 // Load clients
 async function loadClients(){
+  const clientsTable = document.getElementById("clientsTable");
   clientsTable.innerHTML="";
   const snapshot = await getDocs(collection(db,"clients"));
   snapshot.forEach(docSnap=>{
@@ -61,128 +32,41 @@ async function loadClients(){
         <td data-label="Phones">${phones}</td>
         <td data-label="Services">${services}</td>
         <td data-label="Actions">
-          <button onclick="openClientModal('${docSnap.id}','${c.name}')">View Profile</button>
+          <button onclick="openClientModal('${docSnap.id}')">View Profile</button>
         </td>
       </tr>
     `;
   });
 }
 
-// Add client
-addClientForm.addEventListener("submit", async e=>{
-  e.preventDefault();
-  const clientData = {
-    name: document.getElementById("clientName").value,
-    phones: [document.getElementById("clientPhone1").value, document.getElementById("clientPhone2").value].filter(Boolean),
-    email: document.getElementById("clientEmail").value,
-    address: document.getElementById("clientAddress").value,
-    stage: document.getElementById("clientStage").value,
-    assignedExecutive: document.getElementById("clientExecutive").value,
-    interestedServices:[{
-      primary: document.getElementById("clientCountry").value,
-      sub: document.getElementById("clientService").value,
-      estimatedPrice: parseFloat(document.getElementById("clientPrice").value)
-    }],
-    profilePicture: document.getElementById("clientProfilePic").value,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  };
-  await addDoc(collection(db,"clients"), clientData);
-  addClientForm.reset();
-  loadClients();
-});
-
 // Open client modal
-window.openClientModal = async function(clientId, clientName){
+window.openClientModal = async function(clientId){
   currentClientId = clientId;
-  modalClientName.innerText = clientName;
-  clientModal.style.display="flex";
+  const docRef = doc(db,"clients",clientId);
+  const docSnap = await getDoc(docRef);
 
-  // Load profile data
-  const snapshot = await getDocs(collection(db,"clients"));
-  snapshot.forEach(docSnap=>{
-    if(docSnap.id === clientId){
-      const c = docSnap.data();
-      document.getElementById("modalName").value = c.name||"";
-      document.getElementById("modalPhone1").value = c.phones?.[0]||"";
-      document.getElementById("modalPhone2").value = c.phones?.[1]||"";
-      document.getElementById("modalEmail").value = c.email||"";
-      document.getElementById("modalAddress").value = c.address||"";
-      document.getElementById("modalStage").value = c.stage||"";
-      document.getElementById("modalExecutive").value = c.assignedExecutive||"";
-      document.getElementById("modalCountry").value = c.interestedServices?.[0]?.primary||"";
-      document.getElementById("modalService").value = c.interestedServices?.[0]?.sub||"";
-      document.getElementById("modalPrice").value = c.interestedServices?.[0]?.estimatedPrice||"";
-      document.getElementById("modalProfilePic").value = c.profilePicture||"";
-    }
-  });
+  if(docSnap.exists()){
+    const c = docSnap.data();
+    document.getElementById("modalClientName").innerText = c.name;
+    document.getElementById("modalName").value = c.name||"";
+    document.getElementById("modalPhone1").value = c.phones?.[0]||"";
+    document.getElementById("modalPhone2").value = c.phones?.[1]||"";
+    document.getElementById("modalEmail").value = c.email||"";
+    document.getElementById("modalAddress").value = c.address||"";
+    document.getElementById("modalStage").value = c.stage||"";
+    document.getElementById("modalExecutive").value = c.assignedExecutive||"";
+    document.getElementById("modalCountry").value = c.interestedServices?.[0]?.primary||"";
+    document.getElementById("modalService").value = c.interestedServices?.[0]?.sub||"";
+    document.getElementById("modalPrice").value = c.interestedServices?.[0]?.estimatedPrice||"";
+    document.getElementById("modalProfilePic").value = c.profilePicture||"";
+  }
 
+  document.getElementById("clientModal").style.display="flex";
   loadInteractions();
 }
 
 // Close modal
-window.closeModal = ()=> clientModal.style.display="none";
-
-// Save profile from modal
-profileForm.addEventListener("submit", async e=>{
-  e.preventDefault();
-  if(!currentClientId) return;
-  const docRef = doc(db,"clients",currentClientId);
-  const data = {
-    name: document.getElementById("modalName").value,
-    phones: [document.getElementById("modalPhone1").value, document.getElementById("modalPhone2").value].filter(Boolean),
-    email: document.getElementById("modalEmail").value,
-    address: document.getElementById("modalAddress").value,
-    stage: document.getElementById("modalStage").value,
-    assignedExecutive: document.getElementById("modalExecutive").value,
-    interestedServices:[{
-      primary: document.getElementById("modalCountry").value,
-      sub: document.getElementById("modalService").value,
-      estimatedPrice: parseFloat(document.getElementById("modalPrice").value)
-    }],
-    profilePicture: document.getElementById("modalProfilePic").value,
-    updatedAt: serverTimestamp()
-  };
-  await updateDoc(docRef, data);
-  alert("Profile updated!");
-  loadClients();
-});
-
-// Add interaction
-addInteractionForm.addEventListener("submit", async e=>{
-  e.preventDefault();
-  if(!currentClientId) return;
-  const docRef = collection(db,"clients",currentClientId,"interactions");
-  await addDoc(docRef, {
-    type: document.getElementById("interactionType").value,
-    phoneUsed: document.getElementById("phoneUsed").value,
-    nextFollowUp: document.getElementById("nextFollowUp").value,
-    notes: document.getElementById("notes").value,
-    date: serverTimestamp()
-  });
-  addInteractionForm.reset();
-  loadInteractions();
-});
-
-// Load interactions
-async function loadInteractions(){
-  interactionsTable.innerHTML="";
-  if(!currentClientId) return;
-  const snapshot = await getDocs(collection(db,"clients",currentClientId,"interactions"));
-  snapshot.forEach(docSnap=>{
-    const i = docSnap.data();
-    const date = i.date?.toDate().toLocaleString() || "";
-    interactionsTable.innerHTML += `
-      <tr>
-        <td data-label="Date">${date}</td>
-        <td data-label="Type">${i.type||""}</td>
-        <td data-label="Phone">${i.phoneUsed||""}</td>
-        <td data-label="Next Follow-up">${i.nextFollowUp||""}</td>
-        <td data-label="Notes">${i.notes||""}</td>
-      </tr>
-    `;
-  });
-}
+window.closeModal = ()=> document.getElementById("clientModal").style.display="none";
 
 // Initial load
 loadClients();
