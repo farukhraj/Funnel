@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Funnel Management App</title>
+  <title>Funnel Management Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -10,19 +10,27 @@
 
   <!-- Tabs -->
   <div class="tabs">
-    <button onclick="openTab('clientList')">Client List</button>
+    <button onclick="openTab('dashboard')">Dashboard</button>
+    <button onclick="openTab('salesLeads')">Sales Leads</button>
     <button onclick="openTab('addClient')">Add Client</button>
   </div>
 
-  <!-- Client List Tab -->
-  <div id="clientList" class="tab-content">
+  <!-- Dashboard Tab -->
+  <div id="dashboard" class="tab-content">
+    <h2>Dashboard</h2>
+    <p>Total Clients: <span id="totalClients">0</span></p>
+  </div>
+
+  <!-- Sales Leads Tab -->
+  <div id="salesLeads" class="tab-content" style="display:none;">
+    <h2>Sales Leads</h2>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Stage</th>
           <th>Phones</th>
-          <th>Interested Services</th>
+          <th>Services</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -32,6 +40,7 @@
 
   <!-- Add Client Tab -->
   <div id="addClient" class="tab-content" style="display:none;">
+    <h2>Add Client</h2>
     <form id="addClientForm">
       <input type="text" id="clientName" placeholder="Client Name" required>
       <input type="text" id="clientPhone1" placeholder="Phone 1">
@@ -44,10 +53,43 @@
     </form>
   </div>
 
+  <!-- Interactions Modal -->
+  <div id="interactionModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Interactions for <span id="modalClientName"></span></h2>
+
+      <form id="addInteractionForm">
+        <select id="interactionType" required>
+          <option value="">-- Select Type --</option>
+          <option value="Call">Call</option>
+          <option value="Message">Message</option>
+          <option value="Meeting">Meeting</option>
+        </select>
+        <input type="text" id="interactionPhone" placeholder="Phone Used">
+        <textarea id="interactionNotes" placeholder="Notes"></textarea>
+        <button type="submit">Save Interaction</button>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Phone</th>
+            <th>Notes</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody id="interactionsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
   <script type="module" src="script.js"></script>
 
   <script>
-    function openTab(tabId) {
+    function openTab(tabId){
       document.querySelectorAll('.tab-content').forEach(tab => tab.style.display='none');
       document.getElementById(tabId).style.display='block';
     }
