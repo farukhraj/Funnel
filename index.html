@@ -1,32 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Funnel Management App</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funnel Management App</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<header>
   <h1>Funnel Management App</h1>
-  <nav>
-    <button class="tab-btn active" data-tab="dashboardTab">Dashboard</button>
-    <button class="tab-btn" data-tab="salesLeadsTab">Sales Leads</button>
-    <button class="tab-btn" data-tab="addClientTab">Add Client</button>
-  </nav>
-</header>
 
-<main>
-  <!-- Dashboard -->
-  <div id="dashboardTab" class="tab-content">
-    <h2>Dashboard</h2>
-    <p>Total Clients: <span id="totalClients">0</span></p>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="salesLeadsTab">Sales Leads</button>
+    <button class="tab-btn" data-tab="addClientTab">Add Client</button>
   </div>
 
   <!-- Sales Leads -->
-  <div id="salesLeadsTab" class="tab-content" style="display:none;">
-    <h2>Sales Leads</h2>
+  <div id="salesLeadsTab" class="tab-content">
+    <h2>Sales Leads (<span id="totalClients">0</span>)</h2>
     <table>
       <thead>
         <tr>
@@ -46,77 +37,78 @@
     <h2>Add / Edit Client</h2>
     <form id="addClientForm">
       <input type="text" id="clientName" placeholder="Client Name" required>
-      <input type="text" id="clientPhone1" placeholder="Phone 1" required>
-      <input type="text" id="clientPhone2" placeholder="Phone 2 (optional)">
-      <input type="text" id="clientEmail" placeholder="Email">
+      <input type="text" id="clientPhone1" placeholder="Phone 1">
+      <input type="text" id="clientPhone2" placeholder="Phone 2">
+      <input type="email" id="clientEmail" placeholder="Email">
       <input type="text" id="clientAddress" placeholder="Address">
-      <input type="text" id="assignedExecutive" placeholder="Assigned Executive">
       <input type="text" id="clientStage" placeholder="Stage">
-      <input type="text" id="clientCountry" placeholder="Country (Service)">
+      <input type="text" id="clientExecutive" placeholder="Assigned Executive">
+      <input type="text" id="clientCountry" placeholder="Country">
       <input type="text" id="clientService" placeholder="Service">
       <input type="number" id="clientPrice" placeholder="Estimated Price">
-      <input type="url" id="profilePicture" placeholder="Profile Picture URL">
+      <input type="text" id="clientProfilePic" placeholder="Profile Picture URL">
       <button type="submit">Save Client</button>
     </form>
   </div>
-</main>
 
-<!-- Client Profile Modal -->
-<div id="interactionModal">
-  <div class="modal-content">
-    <span class="close-btn" onclick="closeModal()">×</span>
-    <h2 id="modalClientName">Client Name</h2>
+  <!-- Modal for Profile & History -->
+  <div id="interactionModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h2 id="modalClientName">Client Name</h2>
 
-    <section>
-      <h3>Profile Info</h3>
-      <form id="profileForm">
-        <input type="text" id="modalClientNameInput" placeholder="Name">
-        <input type="text" id="modalClientPhone1" placeholder="Phone 1">
-        <input type="text" id="modalClientPhone2" placeholder="Phone 2">
-        <input type="text" id="modalClientEmail" placeholder="Email">
-        <input type="text" id="modalClientAddress" placeholder="Address">
-        <input type="text" id="modalAssignedExecutive" placeholder="Assigned Executive">
-        <input type="text" id="modalClientStage" placeholder="Stage">
-        <input type="text" id="modalClientCountry" placeholder="Country">
-        <input type="text" id="modalClientService" placeholder="Service">
-        <input type="number" id="modalClientPrice" placeholder="Estimated Price">
-        <input type="url" id="modalProfilePicture" placeholder="Profile Picture URL">
-        <button type="submit">Save Profile</button>
-      </form>
-    </section>
+      <nav class="modal-tabs">
+        <button class="modal-tab-btn active" data-tab="profileTab">Profile</button>
+        <button class="modal-tab-btn" data-tab="historyTab">History</button>
+      </nav>
 
-    <section>
-      <h3>History / Interactions</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Phone</th>
-            <th>Notes / Changes</th>
-          </tr>
-        </thead>
-        <tbody id="interactionsTable"></tbody>
-      </table>
-    </section>
+      <div id="profileTab" class="modal-tab-content">
+        <form id="profileForm">
+          <input type="text" id="modalName" placeholder="Name" required>
+          <input type="text" id="modalPhone1" placeholder="Phone 1">
+          <input type="text" id="modalPhone2" placeholder="Phone 2">
+          <input type="email" id="modalEmail" placeholder="Email">
+          <input type="text" id="modalAddress" placeholder="Address">
+          <input type="text" id="modalStage" placeholder="Stage">
+          <input type="text" id="modalExecutive" placeholder="Assigned Executive">
+          <input type="text" id="modalCountry" placeholder="Country">
+          <input type="text" id="modalService" placeholder="Service">
+          <input type="number" id="modalPrice" placeholder="Estimated Price">
+          <input type="text" id="modalProfilePic" placeholder="Profile Picture URL">
+          <button type="submit">Save Profile</button>
+        </form>
+      </div>
 
-    <section>
-      <h3>Add Interaction</h3>
-      <form id="addInteractionForm">
-        <select id="interactionType" required>
-          <option value="">-- Select Type --</option>
-          <option value="Call">Call</option>
-          <option value="Message">Message</option>
-          <option value="Meeting">Meeting</option>
-        </select>
-        <input type="text" id="phoneUsed" placeholder="Phone Used">
-        <textarea id="notes" placeholder="Notes"></textarea>
-        <button type="submit">Add Interaction</button>
-      </form>
-    </section>
+      <div id="historyTab" class="modal-tab-content" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Phone</th>
+              <th>Notes / Changes</th>
+            </tr>
+          </thead>
+          <tbody id="interactionsTable"></tbody>
+        </table>
+
+        <h3>Add Interaction</h3>
+        <form id="addInteractionForm">
+          <select id="interactionType" required>
+            <option value="">--Select Type--</option>
+            <option value="Call">Call</option>
+            <option value="Message">Message</option>
+            <option value="Meeting">Meeting</option>
+          </select>
+          <input type="text" id="phoneUsed" placeholder="Phone Used">
+          <textarea id="notes" placeholder="Interaction Notes"></textarea>
+          <button type="submit">Add Interaction</button>
+        </form>
+      </div>
+    </div>
   </div>
-</div>
 
-<script type="module" src="script.js"></script>
+  <!-- Firebase SDKs -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
