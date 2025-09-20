@@ -11,11 +11,11 @@ const firebaseConfig = {
   appId: "1:574308221054:web:9a27e9b1e8e8c0270d982f",
   measurementId: "G-2M5P17GZZJ"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let currentClientId = null;
+const modal = document.getElementById("interactionModal");
 
 // Load Clients
 async function loadClients() {
@@ -23,6 +23,7 @@ async function loadClients() {
   tableBody.innerHTML = "";
   const snapshot = await getDocs(collection(db, "clients"));
   document.getElementById("totalClients").innerText = snapshot.size;
+
   snapshot.forEach(docSnap => {
     const c = docSnap.data();
     const phones = c.phones?.join(", ") || "N/A";
@@ -59,22 +60,23 @@ document.getElementById("addClientForm").addEventListener("submit", async e=>{
   loadClients();
 });
 
-// Modal logic
-const modal = document.getElementById("interactionModal");
-function closeModal(){ modal.style.display="none"; }
-
+// Open Interactions Modal
 window.openInteractions = async function(clientId, clientName){
   currentClientId = clientId;
   document.getElementById("modalClientName").innerText = clientName;
-  modal.style.display = "block";
+  modal.style.display = "flex";
   loadInteractions();
 }
 
-// Load interactions
+// Close Modal
+window.closeModal = function(){ modal.style.display="none"; }
+
+// Load Interactions
 async function loadInteractions(){
   const tbody = document.getElementById("interactionsTable");
   tbody.innerHTML = "";
   if(!currentClientId) return;
+
   const snapshot = await getDocs(collection(db, "clients", currentClientId, "interactions"));
   snapshot.forEach(docSnap=>{
     const i = docSnap.data();
@@ -90,7 +92,7 @@ async function loadInteractions(){
   });
 }
 
-// Edit Interaction
+// Edit Interaction (only notes for now)
 window.editInteraction = async function(interactionId){
   const ref = doc(db, "clients", currentClientId, "interactions", interactionId);
   const newNotes = prompt("Edit Notes:");
