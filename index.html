@@ -6,84 +6,54 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Funnel Management Test</h1>
+  <h1>Funnel Management</h1>
 
-  <!-- Add Client Button -->
-  <button id="addClientBtn">Add Client</button>
-
-  <!-- Modal -->
-  <div id="clientModal">
-    <div>
-      <h3>Add Client</h3>
-      <form id="clientForm">
-        <label>Name:</label>
-        <input type="text" id="clientName" required>
-
-        <label>Phone:</label>
-        <input type="text" id="clientPhone" required>
-
-        <label>Stage:</label>
-        <input type="text" id="clientStage" required>
-
-        <label>Country:</label>
-        <input type="text" id="clientCountry" required>
-
-        <label>Service:</label>
-        <input type="text" id="clientService" required>
-
-        <label>Price:</label>
-        <input type="number" id="clientPrice" required>
-
-        <button type="submit">Save</button>
-        <button type="button" id="closeModal">Cancel</button>
-      </form>
-    </div>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn" onclick="openTab('clientList')">Client List</button>
+    <button class="tab-btn" onclick="openTab('addClient')">Add Client</button>
   </div>
 
-  <!-- Clients Table -->
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Stage</th>
-        <th>Phones</th>
-        <th>Interested Services</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="clientsTable"></tbody>
-  </table>
-
-  <!-- Interactions Section -->
-  <div id="interactionsSection" class="interactions">
-    <h2>Interactions for <span id="clientNameTitle"></span></h2>
-
-    <form id="addInteractionForm">
-      <select id="interactionType" required>
-        <option value="">-- Select Type --</option>
-        <option value="Call">Call</option>
-        <option value="Message">Message</option>
-        <option value="Meeting">Meeting</option>
-      </select>
-      <input type="text" id="phoneUsed" placeholder="Phone Used">
-      <textarea id="notes" placeholder="Interaction Notes"></textarea>
-      <button type="submit">Add Interaction</button>
-    </form>
-
+  <!-- Client List Tab -->
+  <div id="clientList" class="tab-content">
     <table>
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Type</th>
-          <th>Phone</th>
-          <th>Notes</th>
+          <th>Name</th>
+          <th>Stage</th>
+          <th>Phones</th>
+          <th>Interested Services</th>
+          <th>Actions</th>
         </tr>
       </thead>
-      <tbody id="interactionsTable"></tbody>
+      <tbody id="clientsTable"></tbody>
     </table>
+  </div>
+
+  <!-- Add Client Tab -->
+  <div id="addClient" class="tab-content" style="display:none;">
+    <form id="addClientForm">
+      <input type="text" id="clientName" placeholder="Client Name" required>
+      <input type="text" id="clientPhone" placeholder="Phone" required>
+      <input type="text" id="clientStage" placeholder="Stage">
+      <input type="text" id="clientCountry" placeholder="Country">
+      <input type="text" id="clientService" placeholder="Service">
+      <input type="number" id="clientPrice" placeholder="Estimated Price">
+      <button type="submit">Add Client</button>
+    </form>
   </div>
 
   <!-- Firebase + App JS -->
   <script type="module" src="script.js"></script>
+
+  <!-- Tabs Script -->
+  <script>
+    function openTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+      });
+      document.getElementById(tabId).style.display = 'block';
+    }
+  </script>
 </body>
 </html>
