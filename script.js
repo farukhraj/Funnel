@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -11,110 +11,119 @@ const firebaseConfig = {
   appId: "1:574308221054:web:9a27e9b1e8e8c0270d982f",
   measurementId: "G-2M5P17GZZJ"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let currentClientId = null;
-const modal = document.getElementById("interactionModal");
 
-// Load Clients
-async function loadClients() {
-  const tableBody = document.getElementById("clientsTable");
-  tableBody.innerHTML = "";
-  const snapshot = await getDocs(collection(db, "clients"));
-  document.getElementById("totalClients").innerText = snapshot.size;
+// DOM elements
+const clientsTable = document.getElementById("clientsTable");
+const addClientForm = document.getElementById("addClientForm");
+const interactionModal = document.getElementById("interactionModal");
+const modalClientName = document.getElementById("modalClientName");
+const addInteractionForm = document.getElementById("addInteractionForm");
+const interactionsTable = document.getElementById("interactionsTable");
 
-  snapshot.forEach(docSnap => {
+// Load clients
+async function loadClients(){
+  clientsTable.innerHTML = "";
+  const snapshot = await getDocs(collection(db,"clients"));
+  snapshot.forEach(docSnap=>{
     const c = docSnap.data();
     const phones = c.phones?.join(", ") || "N/A";
-    const services = c.interestedServices?.map(s => `${s.primary} (${s.sub}) $${s.estimatedPrice}`).join("<br>") || "";
-    tableBody.innerHTML += `
+    const services = c.interestedServices?.map(s=>`${s.primary} (${s.sub}) $${s.estimatedPrice}`).join(", ") || "";
+
+    clientsTable.innerHTML += `
       <tr>
-        <td>${c.name}</td>
-        <td>${c.stage}</td>
-        <td>${phones}</td>
-        <td>${services}</td>
-        <td><button onclick="openInteractions('${docSnap.id}', '${c.name}')">View/Edit</button></td>
+        <td data-label="Name">${c.name}</td>
+        <td data-label="Stage">${c.stage}</td>
+        <td data-label="Phones">${phones}</td>
+        <td data-label="Services">${services}</td>
+        <td data-label="Actions">
+          <button onclick="openInteractions('${docSnap.id}','${c.name}')">View/Edit</button>
+        </td>
       </tr>
     `;
   });
+
+  // Update dashboard count
+  const totalClients = document.getElementById("totalClients");
+  if(totalClients) totalClients.innerText = snapshot.size;
 }
 
-// Add Client
-document.getElementById("addClientForm").addEventListener("submit", async e=>{
+// Add client
+addClientForm.addEventListener("submit", async e=>{
   e.preventDefault();
-  await addDoc(collection(db, "clients"), {
-    name: document.getElementById("clientName").value,
-    phones: [document.getElementById("clientPhone1").value, document.getElementById("clientPhone2").value].filter(Boolean),
-    stage: document.getElementById("clientStage").value,
-    interestedServices:[{
-      primary: document.getElementById("clientCountry").value,
-      sub: document.getElementById("clientService").value,
-      estimatedPrice: parseFloat(document.getElementById("clientPrice").value)
-    }],
+  const name = document.getElementById("clientName").value;
+  const phone1 = document.getElementById("clientPhone1").value;
+  const phone2 = document.getElementById("clientPhone2").value;
+  const stage = document.getElementById("clientStage").value;
+  const country = document.getElementById("clientCountry").value;
+  const service = document.getElementById("clientService").value;
+  const price = parseFloat(document.getElementById("clientPrice").value);
+
+  await addDoc(collection(db,"clients"),{
+    name,
+    phones: [phone1, phone2].filter(Boolean),
+    stage,
+    interestedServices: [{primary:country, sub:service, estimatedPrice:price}],
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   });
-  alert("Client added!");
-  e.target.reset();
+
+  addClientForm.reset();
   loadClients();
+  alert("Client added!");
 });
 
-// Open Interactions Modal
+// Open interactions modal
 window.openInteractions = async function(clientId, clientName){
   currentClientId = clientId;
-  document.getElementById("modalClientName").innerText = clientName;
-  modal.style.display = "flex";
+  modalClientName.innerText = clientName;
+  interactionModal.style.display = "flex";
   loadInteractions();
 }
 
-// Close Modal
-window.closeModal = function(){ modal.style.display="none"; }
+// Close modal
+window.closeModal = function(){ interactionModal.style.display="none"; }
 
-// Load Interactions
+// Load interactions
 async function loadInteractions(){
-  const tbody = document.getElementById("interactionsTable");
-  tbody.innerHTML = "";
+  interactionsTable.innerHTML="";
   if(!currentClientId) return;
 
-  const snapshot = await getDocs(collection(db, "clients", currentClientId, "interactions"));
+  const snapshot = await getDocs(collection(db,"clients",currentClientId,"interactions"));
   snapshot.forEach(docSnap=>{
     const i = docSnap.data();
-    tbody.innerHTML += `
+    const date = i.date?.toDate().toLocaleString() || "N/A";
+    interactionsTable.innerHTML += `
       <tr>
-        <td>${i.date?.toDate().toLocaleString()||"N/A"}</td>
-        <td>${i.type}</td>
-        <td>${i.phoneUsed||""}</td>
-        <td>${i.notes||""}</td>
-        <td><button onclick="editInteraction('${docSnap.id}')">Edit</button></td>
+        <td data-label="Date">${date}</td>
+        <td data-label="Type">${i.type || ""}</td>
+        <td data-label="Phone">${i.phoneUsed || ""}</td>
+        <td data-label="Notes">${i.notes || ""}</td>
+        <td data-label="Edit"><button>Edit</button></td>
       </tr>
     `;
   });
 }
 
-// Edit Interaction (only notes for now)
-window.editInteraction = async function(interactionId){
-  const ref = doc(db, "clients", currentClientId, "interactions", interactionId);
-  const newNotes = prompt("Edit Notes:");
-  if(newNotes!==null){
-    await updateDoc(ref,{notes:newNotes, updatedAt: serverTimestamp()});
-    loadInteractions();
-  }
-}
-
-// Add Interaction
-document.getElementById("addInteractionForm").addEventListener("submit", async e=>{
+// Add interaction
+addInteractionForm.addEventListener("submit", async e=>{
   e.preventDefault();
   if(!currentClientId) return;
-  await addDoc(collection(db, "clients", currentClientId, "interactions"),{
-    type: document.getElementById("interactionType").value,
-    phoneUsed: document.getElementById("interactionPhone").value,
-    notes: document.getElementById("interactionNotes").value,
-    date: serverTimestamp()
+
+  const type = document.getElementById("interactionType").value;
+  const phone = document.getElementById("interactionPhone").value;
+  const notes = document.getElementById("interactionNotes").value;
+
+  await addDoc(collection(db,"clients",currentClientId,"interactions"),{
+    type, phoneUsed:phone, notes, date:serverTimestamp()
   });
-  e.target.reset();
+
+  addInteractionForm.reset();
   loadInteractions();
 });
 
-// Initial load
 loadClients();
