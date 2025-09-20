@@ -38,7 +38,6 @@ button:hover { background:#45a049; }
   .modal-content { width:98%; height:98%; padding:15px; }
 }
 </style>
-
 </head>
 <body>
 
@@ -50,7 +49,6 @@ button:hover { background:#45a049; }
   <button class="tab-btn" data-tab="addClientTab">Add Client</button>
 </div>
 
-<!-- Tabs -->
 <div id="dashboardTab" class="tab-content" style="display:block;">
   <h2>Dashboard</h2>
   <div class="dashboard-card">Total Clients: <span id="totalClients">0</span></div>
@@ -60,9 +58,7 @@ button:hover { background:#45a049; }
   <h2>Sales Leads</h2>
   <table>
     <thead>
-      <tr>
-        <th>Name</th><th>Stage</th><th>Phones</th><th>Services</th><th>Actions</th>
-      </tr>
+      <tr><th>Name</th><th>Stage</th><th>Phones</th><th>Services</th><th>Actions</th></tr>
     </thead>
     <tbody id="clientsTable"></tbody>
   </table>
