@@ -103,28 +103,25 @@ th {
   color: white;
 }
 
-/* Responsive */
+/* ✅ Responsive Tables */
 @media(max-width:768px){
   table, thead, tbody, th, td, tr{
     display: block;
     width: 100%;
   }
+  tr { margin-bottom: 10px; }
   th, td{
     text-align: right;
     padding-left:50%;
     position: relative;
   }
-  th::before, td::before{
+  td::before{
     position: absolute;
     left:10px;
     width: 45%;
     text-align: left;
     font-weight: bold;
-  }
-  td::before{
     content: attr(data-label);
   }
-  thead{
-    display:none;
-  }
+  thead{ display:none; }
 }
