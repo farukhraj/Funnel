@@ -1,50 +1,56 @@
-/* Basic Reset */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
   font-family: Arial, sans-serif;
-  padding: 20px;
-  background: #f9f9f9;
+  margin: 0;
+  padding: 0;
 }
 
 header {
+  background: #4CAF50;
+  color: white;
+  padding: 10px;
   text-align: center;
-  margin-bottom: 20px;
 }
 
-.tabs {
+nav {
   margin-top: 10px;
 }
 
 .tab-btn {
-  padding: 10px 20px;
-  margin: 0 5px;
+  padding: 10px 15px;
   border: none;
-  background: #4CAF50;
-  color: white;
   cursor: pointer;
-  border-radius: 5px;
+  background: #f2f2f2;
+  margin-right: 5px;
 }
 
-.tab-btn.active { background: #45a049; }
+.tab-btn.active {
+  background: #4CAF50;
+  color: white;
+}
 
-.tab-content { display: none; margin-top: 20px; }
+.tab-content {
+  padding: 20px;
+}
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 th, td {
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
   padding: 8px;
-  text-align: left;
 }
 
-th { background: #eee; }
+th {
+  background: #f2f2f2;
+}
 
-button { cursor: pointer; }
+button {
+  padding: 6px 10px;
+  cursor: pointer;
+}
 
 #interactionModal {
   display: none;
@@ -52,41 +58,34 @@ button { cursor: pointer; }
   top:0; left:0;
   width:100%; height:100%;
   background: rgba(0,0,0,0.5);
-  justify-content: center; align-items: center;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal-content {
   background: white;
-  padding: 20px;
   width: 90%;
-  max-width: 500px;
-  border-radius: 10px;
-  position: relative;
+  max-width: 600px;
+  padding: 20px;
+  border-radius: 8px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .close-btn {
-  position: absolute;
-  top:10px;
-  right:10px;
-  background:red;
-  color:white;
-  border:none;
-  padding:5px 10px;
-  cursor:pointer;
-  border-radius:5px;
+  float: right;
+  font-size: 22px;
+  cursor: pointer;
 }
 
-/* Responsive */
-@media screen and (max-width:600px){
-  table, thead, tbody, th, td, tr { display:block; }
-  tr { margin-bottom:15px; }
-  td { text-align: right; padding-left:50%; position: relative; }
-  td::before {
-    content: attr(data-label);
-    position: absolute;
-    left:10px;
-    width:45%;
-    font-weight:bold;
-    text-align:left;
-  }
+input, select, textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  box-sizing: border-box;
 }
+
+textarea {
+  resize: vertical;
+}
+  
