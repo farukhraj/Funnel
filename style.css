@@ -1,31 +1,32 @@
 body { margin:0; font-family:Arial,sans-serif; background:#f8f8f8; padding:10px; }
-h1 { text-align:center; }
-.tabs { display:flex; background:#4CAF50; margin-bottom:10px; }
+h1 { text-align:center; margin-bottom:20px; font-size:22px; }
+.tabs { display:flex; background:#4CAF50; margin-bottom:10px; border-radius:10px; overflow:hidden; }
 .tabs button { flex:1; padding:15px; color:white; border:none; cursor:pointer; font-size:16px; }
 .tabs button:hover { background:#45a049; }
 .tabs button.active { background:#3e8e41; }
 .tab-content { display:none; padding:10px; }
-.dashboard-card { background:white; padding:15px; margin-bottom:10px; border-radius:10px; text-align:center; }
-table { width:100%; border-collapse:collapse; background:white; }
-th, td { border:1px solid #ddd; padding:10px; text-align:center; }
+.dashboard-card { background:white; padding:15px; margin-bottom:10px; border-radius:10px; text-align:center; font-size:16px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+table { width:100%; border-collapse:collapse; background:white; margin-bottom:20px; font-size:14px; }
+th, td { border:1px solid #ddd; padding:8px; text-align:center; }
 th { background:#f2f2f2; }
 table tbody tr:nth-child(even){background:#f9f9f9;}
-input, select, button, textarea { width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box; font-size:16px; }
-button { background:#4CAF50; color:white; border:none; cursor:pointer; }
+input, select, button, textarea { width:100%; padding:12px; margin-bottom:10px; box-sizing:border-box; font-size:16px; border-radius:6px; border:1px solid #ccc;}
+button { background:#4CAF50; color:white; border:none; cursor:pointer; font-weight:bold; }
 button:hover { background:#45a049; }
 .modal { position:fixed; top:0; left:0; width:100%; height:100%; 
-         background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:100; }
-.modal-content { background:white; padding:20px; border-radius:10px; width:90%; max-width:500px; max-height:90%; overflow:auto; }
-.close { float:right; cursor:pointer; font-weight:bold; font-size:20px; }
+         background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:100; }
+.modal-content { background:white; padding:20px; border-radius:10px; width:95%; max-width:500px; max-height:95%; overflow:auto; box-shadow:0 2px 10px rgba(0,0,0,0.3);}
+.close { float:right; cursor:pointer; font-weight:bold; font-size:22px; }
 
-/* Responsive mobile app-like cards */
 @media screen and (max-width:600px){
+  .tabs button { font-size:14px; padding:12px; }
+  .dashboard-card { font-size:14px; padding:10px; }
   table, thead, tbody, th, td, tr { display:block; width:100%; }
   thead { display:none; }
-  tbody tr { margin-bottom:10px; border:1px solid #ddd; border-radius:10px; padding:10px; background:white; }
-  tbody td { display:block; text-align:left; padding:5px 10px; position:relative; }
+  tbody tr { margin-bottom:10px; border:1px solid #ddd; border-radius:10px; padding:10px; background:white; box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+  tbody td { display:block; text-align:left; padding:5px 10px; position:relative; font-size:14px; }
   tbody td::before { content: attr(data-label); font-weight:bold; display:inline-block; width:120px; }
-  tbody td button { margin-top:10px; width:100%; }
-  .modal-content { width:95%; height:95%; padding:15px; }
-  input, select, textarea, button { font-size:18px; padding:12px; }
+  tbody td button { margin-top:8px; width:100%; }
+  input, select, textarea, button { font-size:16px; padding:10px; }
+  .modal-content { width:98%; height:98%; padding:15px; }
 }
