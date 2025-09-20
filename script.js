@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCC26AlX5xVRo_s0nDI1Ua26JbWh2d1FKk",
   authDomain: "leads-to-funnel.firebaseapp.com",
@@ -11,22 +12,66 @@ const firebaseConfig = {
   measurementId: "G-2M5P17GZZJ"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let currentClientId = null;
-let currentClientName = "";
+// Modal Elements
+const addClientBtn = document.getElementById("addClientBtn");
+const clientModal = document.getElementById("clientModal");
+const closeModal = document.getElementById("closeModal");
+const clientForm = document.getElementById("clientForm");
 
-// Load Clients
+// Open Modal
+addClientBtn.addEventListener("click", () => {
+  clientModal.style.display = "flex";
+});
+
+// Close Modal
+closeModal.addEventListener("click", () => {
+  clientModal.style.display = "none";
+});
+
+// Add Client via Modal
+clientForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  try {
+    await addDoc(collection(db, "clients"), {
+      name: document.getElementById("clientName").value,
+      phones: [document.getElementById("clientPhone").value],
+      stage: document.getElementById("clientStage").value,
+      interestedServices: [
+        {
+          primary: document.getElementById("clientCountry").value,
+          sub: document.getElementById("clientService").value,
+          estimatedPrice: parseFloat(document.getElementById("clientPrice").value)
+        }
+      ],
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    alert("Client added!");
+    clientModal.style.display = "none";
+    clientForm.reset();
+    loadClients(); // refresh client table without full reload
+  } catch (error) {
+    console.error("Error adding client: ", error);
+    alert("Failed to add client. Check console for details.");
+  }
+});
+
+// Load Clients into Table
 async function loadClients() {
   const tableBody = document.getElementById("clientsTable");
+  if (!tableBody) return;
   tableBody.innerHTML = "";
 
   const querySnapshot = await getDocs(collection(db, "clients"));
   querySnapshot.forEach((docSnap) => {
     const client = docSnap.data();
     const phones = client.phones ? client.phones.join(", ") : "N/A";
-
     let servicesText = "";
     if (client.interestedServices && client.interestedServices.length > 0) {
       client.interestedServices.forEach(service => {
@@ -40,48 +85,24 @@ async function loadClients() {
         <td>${client.stage || "N/A"}</td>
         <td>${phones}</td>
         <td>${servicesText}</td>
-        <td><button onclick="viewInteractions('${docSnap.id}', '${client.name}')">View Interactions</button></td>
+        <td>
+          <button onclick="viewInteractions('${docSnap.id}', '${client.name}')">View Interactions</button>
+        </td>
       </tr>
     `;
     tableBody.innerHTML += row;
   });
 }
 
-// Add Client
-document.getElementById("addClientForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const name = document.getElementById("name").value;
-  const stage = document.getElementById("stage").value;
-  const phone1 = document.getElementById("phone1").value;
-  const phone2 = document.getElementById("phone2").value;
-  const servicePrimary = document.getElementById("servicePrimary").value;
-  const serviceSub = document.getElementById("serviceSub").value;
-  const estimatedPrice = parseFloat(document.getElementById("estimatedPrice").value);
-
-  await addDoc(collection(db, "clients"), {
-    name,
-    stage,
-    phones: [phone1, phone2].filter(Boolean),
-    interestedServices: [{ primary: servicePrimary, sub: serviceSub, estimatedPrice }],
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  });
-
-  e.target.reset();
-  loadClients();
-});
-
-// View Interactions
+// Interactions (same as previous)
+let currentClientId = null;
 window.viewInteractions = async function(clientId, clientName) {
   currentClientId = clientId;
-  currentClientName = clientName;
   document.getElementById("clientNameTitle").innerText = clientName;
   document.getElementById("interactionsSection").style.display = "block";
   loadInteractions();
 }
 
-// Load Interactions
 async function loadInteractions() {
   const tableBody = document.getElementById("interactionsTable");
   tableBody.innerHTML = "";
@@ -105,7 +126,7 @@ async function loadInteractions() {
 }
 
 // Add Interaction
-document.getElementById("addInteractionForm").addEventListener("submit", async (e) => {
+document.getElementById("addInteractionForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!currentClientId) return;
 
@@ -121,8 +142,9 @@ document.getElementById("addInteractionForm").addEventListener("submit", async (
     date: serverTimestamp()
   });
 
-  e.target.reset();
+  document.getElementById("addInteractionForm").reset();
   loadInteractions();
 });
 
+// Initial load
 loadClients();
