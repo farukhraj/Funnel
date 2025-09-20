@@ -1,162 +1,134 @@
-/* Base Styles */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f9f9f9;
-  color: #333;
-  padding-bottom: 60px; /* space for bottom nav */
+:root{
+  --accent:#4CAF50;
+  --bg:#f6f7f9;
+  --card:#fff;
 }
 
-header {
-  background: #4CAF50;
-  color: white;
-  padding: 12px;
-  text-align: center;
-  font-size: 18px;
+/* Basic / global */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background:var(--bg);
+  color:#222;
+  padding-bottom:72px; /* room for bottom nav */
 }
 
-.tab-content {
-  padding: 15px;
+/* Header */
+header{
+  background:var(--accent);
+  color:white;
+  padding:14px 12px;
+  text-align:center;
 }
+header h1{margin:0;font-size:18px}
+header .subtitle{margin:6px 0 0;font-size:13px;opacity:.95}
 
-/* Table Styles */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-}
+/* main content */
+main{padding:12px}
+h2{margin:6px 0 12px}
 
-th, td {
-  border: 1px solid #eee;
-  padding: 10px;
-  text-align: left;
+/* forms */
+form input, form textarea, form select{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:8px;
+  border:1px solid #ddd;
+  font-size:15px;
+  background: #fff;
 }
+form textarea{min-height:80px; resize:vertical}
 
-th {
-  background: #f2f2f2;
+/* buttons */
+button{
+  display:inline-block;
+  padding:10px 12px;
+  border-radius:8px;
+  border:none;
+  background:var(--accent);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
 }
+button:active{transform:translateY(1px)}
+
+/* table common */
+table{width:100%; border-collapse:collapse; background:var(--card); border-radius:10px; overflow:hidden}
+thead th{background:#f3f4f6; padding:10px; text-align:left; font-weight:600}
+td, th{padding:10px; border-bottom:1px solid #eee}
+
+/* small layout improvements */
+.clients-table thead th, .history-table thead th{font-size:13px}
 
 /* Modal */
-.modal {
-  display: none;
-  position: fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background: rgba(0,0,0,0.5);
+.modal{
+  display:none;
+  position:fixed; inset:0;
+  background: rgba(0,0,0,0.45);
+  z-index:999;
   justify-content:center;
   align-items:center;
+  padding:12px;
 }
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  padding: 20px;
+.modal-content{
+  width:100%;
+  max-width:640px;
+  border-radius:12px;
+  background:var(--card);
+  padding:16px;
+  max-height:92vh;
+  overflow:auto;
+  position:relative;
 }
+.modal-close{position:absolute;right:12px;top:10px;background:transparent;color:#666;border:none;font-size:20px;cursor:pointer}
 
-.close {
-  position: absolute;
-  top:12px;
-  right:12px;
-  font-size: 22px;
-  cursor: pointer;
+/* modal tabs */
+.modal-tabs{display:flex; gap:8px; margin:10px 0}
+.modal-tab-btn{flex:1;padding:8px;border-radius:8px;border:none;background:#efefef;cursor:pointer;font-weight:600}
+.modal-tab-btn.active{background:var(--accent);color:white}
+
+/* bottom nav */
+.bottom-nav{
+  position:fixed;
+  bottom:0; left:0; right:0;
+  display:flex;
+  background:white;
+  border-top:1px solid #e6e6e6;
+  z-index:1000;
+  height:60px;
 }
-
-/* Modal tabs */
-.modal-tabs {
-  display: flex;
-  gap: 5px;
-  margin-bottom: 10px;
+.bottom-nav .tab-btn{
+  flex:1;
+  border:none;
+  background:transparent;
+  font-size:13px;
+  padding:10px 6px;
+  cursor:pointer;
 }
+.bottom-nav .tab-btn.active{background:var(--accent); color:white}
 
-.modal-tab-btn {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-  background: #eee;
-  border-radius: 6px;
-  font-size: 14px;
-}
+/* Responsive: turn tables into cards on small screens, modal full screen */
+@media (max-width: 760px){
+  /* table -> card style */
+  table, thead, tbody, th, td, tr { display:block; width:100% }
+  thead { display:none }
+  tr{ margin:10px 0; border-radius:10px; background:var(--card); padding:10px; box-shadow:0 1px 2px rgba(0,0,0,0.03) }
+  td{ display:flex; justify-content:space-between; padding:8px 10px; border-bottom:0; }
+  td::before{ content: attr(data-label); font-weight:700; color:#555; width:42%; text-align:left }
+  td:last-child{ display:block; margin-top:8px } /* actions full width */
 
-.modal-tab-btn.active {
-  background: #4CAF50;
-  color: white;
-}
-
-/* ✅ Bottom Navigation Bar */
-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  background: #fff;
-  border-top: 1px solid #ddd;
-  z-index: 1000;
-}
-
-nav button {
-  flex: 1;
-  padding: 12px;
-  cursor: pointer;
-  border: none;
-  background: #fff;
-  font-size: 14px;
-}
-
-nav button.active {
-  background: #4CAF50;
-  color: white;
-}
-
-/* ✅ Mobile Optimizations */
-@media(max-width:768px){
-  /* Table mobile style */
-  table, thead, tbody, th, td, tr{
-    display: block;
-    width: 100%;
-  }
-  tr { margin-bottom: 10px; }
-  th, td{
-    text-align: right;
-    padding-left:50%;
-    position: relative;
-  }
-  td::before{
-    position: absolute;
-    left:10px;
-    width: 45%;
-    text-align: left;
-    font-weight: bold;
-    content: attr(data-label);
-  }
-  thead{ display:none; }
-
-  /* Modal full-screen on mobile */
-  .modal-content {
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-    border-radius: 0;
-    padding: 15px;
+  /* modal full screen */
+  .modal-content{
+    width:100%;
+    height:100%;
+    max-width:none;
+    max-height:none;
+    border-radius:0;
+    padding:16px;
   }
 
-  /* Bigger buttons for touch */
-  nav button {
-    font-size: 16px;
-    padding: 16px;
-  }
+  .bottom-nav{height:64px}
+  button{font-size:16px}
 }
